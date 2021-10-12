@@ -1,4 +1,5 @@
 package app.classes;
+import java.math.BigInteger;
 import java.util.Random;
 
 public class Individual {
@@ -7,6 +8,8 @@ public class Individual {
     int[] genes_x2; //binary length
     double decimalValue_x1 = 0;
     double decimalValue_x2 = 0;
+
+    private Boolean elite = false;
 
     double y = 0;
 
@@ -37,13 +40,19 @@ public class Individual {
     public void calculateDecimalValue(int rangeA, int rangeB){
         String binaryValue_x1 = new String();
         String binaryValue_x2 = new String();
+        //System.out.println(Integer.parseInt("1010", 2));
 
         for(int i=genes_x1.length-1;i>=0; i--){
             binaryValue_x1+=genes_x1[i];
             binaryValue_x2+=genes_x2[i];
         }
-        decimalValue_x1 = rangeA + Integer.parseInt(binaryValue_x1, 2) * (rangeB-rangeA) / (Math.pow(2, genes_x1.length) - 1);
-        decimalValue_x2 = rangeA + Integer.parseInt(binaryValue_x2, 2) * (rangeB-rangeA) / (Math.pow(2, genes_x2.length) - 1);
+        long x1 = Long.parseLong(binaryValue_x1, 2);
+        long x2 = Long.parseLong(binaryValue_x2, 2);
+
+        //System.out.println(x1.intValue());
+        //System.out.println(x1.byteValue());
+        decimalValue_x1 = rangeA + x1 * (rangeB-rangeA) / (Math.pow(2, genes_x1.length) - 1);
+        decimalValue_x2 = rangeA + x2 * (rangeB-rangeA) / (Math.pow(2, genes_x2.length) - 1);
     }
 
     public void setY(double value){
