@@ -10,7 +10,7 @@ public class GeneticAlgorithm {
     private Random rn = new Random();
     private int generation = 0;
     private int maxGenerations = 0;
-    private int rangeA, rangeB = 0;
+    private double rangeA, rangeB = 0;
     private int initialPopulationSize = 0;
     private int bestAndTourneyIndividualsAmount = 0;
     private int eliteAmount = 0;
@@ -23,7 +23,7 @@ public class GeneticAlgorithm {
     private MutationManager mutationManager;
     private InversionManager inversionManager;
 
-    public GeneticAlgorithm(int rangeA, int rangeB, int maxGenerations, int initialPopulationSize, int geneLength, int bestAndTourneyIndividualsAmount, double mutationProbability, double inversionProbability, double crossProbability, int eliteAmount ){
+    public GeneticAlgorithm(double rangeA, double rangeB, int maxGenerations, int initialPopulationSize, int geneLength, int bestAndTourneyIndividualsAmount, double mutationProbability, double inversionProbability, double crossProbability, int eliteAmount ){
         this.rangeA = rangeA;
         this.rangeB = rangeB;
         this.maxGenerations = maxGenerations;
@@ -46,8 +46,9 @@ public class GeneticAlgorithm {
         //population.calculateIndividualsY();
         //population.debug();
         LinkedList<Individual> children = new LinkedList<>();
+        double start = System.currentTimeMillis();
         for(int i = 0; i<maxGenerations; i++){
-            //System.out.println("Generation = "+ i + "( Population: " + population.individuals.size() + ")" );
+            System.out.println("Generation = "+ i + "( Population: " + population.individuals.size() + ")" );
             //DEBUG
             //population.calculateIndividualsDecimalValue(rangeA, rangeB);
             //population.calculateIndividualsY();
@@ -60,24 +61,30 @@ public class GeneticAlgorithm {
             //EVALUATION
             population.calculateIndividualsDecimalValue(rangeA, rangeB);
             population.calculateIndividualsY();
+            Individual solution = population.getBestIndividual();
+            System.out.println(i+": " + solution.getY());
 
             //ELITE STRATEGY
-            //population.getElites(eliteAmount, "min");
+            population.getElites(eliteAmount, "min");
             //population.getOneElite();
             //System.out.println("ELITE Y = " + population.elite.getY());
             //System.out.println(i+": " + population.elite.getY());
-            Individual solution = population.getBestIndividual();
 
-            System.out.println(i+": " + solution.getY());
             //SELECTION
-            population.setIndividuals(selectionManager.rouletteSelection("min", population.individuals));
+            population.setIndividuals(selectionManager.bestSelection("min", population.individuals));
             //CROSSOVER
-            Individual newIndividual;
-            for(int j = 0;j<population.individuals.size()-1; j+=2){
+            Individual newIndividual1, newIndividual2;
+            while(children.size() != initialPopulationSize - eliteAmount){
+                //System.out.println("CROSSOVER, children size = " + children.size());
                 if(0+(1-0) * rn.nextDouble()<=crossProbability) {
-                    newIndividual = new Individual(crossOverManager.crossOver_twoPoints(population.individuals.get(j).genes_x1, population.individuals.get(j + 1).genes_x1)
-                            , crossOverManager.crossOver_onePoint(population.individuals.get(j).genes_x2, population.individuals.get(j + 1).genes_x2));
-                    children.add(newIndividual);
+                    Individual individual1 = population.individuals.get(rn.nextInt(population.individuals.size()));
+                    Individual individual2 = population.individuals.get(rn.nextInt(population.individuals.size()));
+                    newIndividual1 = new Individual(crossOverManager.crossOver_twoPoints(individual1.genes_x1, individual2.genes_x1, true)
+                            , crossOverManager.crossOver_twoPoints(individual1.genes_x2, individual2.genes_x2, true));
+                    children.add(newIndividual1);
+                    newIndividual2 = new Individual(crossOverManager.crossOver_twoPoints(individual2.genes_x1, individual1.genes_x1, false)
+                            , crossOverManager.crossOver_twoPoints(individual2.genes_x2, individual1.genes_x2, false));
+                    children.add(newIndividual2);
                 }
             }
             //MUTATION
@@ -88,7 +95,12 @@ public class GeneticAlgorithm {
             for(Individual individual: children){
                 inversionManager.inverse(individual);
             }
-            population.addChildrenToPopulation(children);
+
+            population.setIndividuals(children);
+
+            population.addIndividualsToPopulation(population.elites); //ENABLE AFTER ELITES IMPLEMENTED
+            //System.out.println("Generation = "+ i + "( Population: " + population.individuals.size() + ")" );
+            //population.addIndividualsToPopulation(children); //DEPRECATED
             //population.addChildrenToPopulation(population.elites);
             //population.addIndividualToPopulation(population.elite);
 
@@ -97,8 +109,10 @@ public class GeneticAlgorithm {
         population.calculateIndividualsDecimalValue(rangeA, rangeB);
         population.calculateIndividualsY();
         Individual solution = population.getBestIndividual();
+        double stop = System.currentTimeMillis();
         System.out.println("BEST SOLUTION");
         System.out.println("F(" + solution.getDecimalValue_x1() + ", " + solution.getDecimalValue_x2() + ") = " + solution.getY());
+        System.out.println("Time to calculate = "+(stop-start)/1000 + "s");
 
 
         //----------------------------------------DEBUG--------------------------------------------------//
@@ -164,8 +178,14 @@ public class GeneticAlgorithm {
 
 
     }
-
-
-
-
 }
+
+/*for(int j = 0;j<population.individuals.size()-1; j+=2){
+                if(0+(1-0) * rn.nextDouble()<=crossProbability) {
+                    newIndividual = new Individual(crossOverManager.crossOver_twoPoints(population.individuals.get(j).genes_x1, population.individuals.get(j + 1).genes_x1)
+                            , crossOverManager.crossOver_onePoint(population.individuals.get(j).genes_x2, population.individuals.get(j + 1).genes_x2));
+                    children.add(newIndividual);
+                }
+            }
+
+ */

@@ -24,10 +24,11 @@ public class Population {
     }
 
     public void setIndividuals(LinkedList<Individual> newIndividuals){
-        individuals = newIndividuals;
+        individuals.clear();
+        individuals.addAll(newIndividuals);
     }
 
-    public void addChildrenToPopulation(LinkedList<Individual> children){
+    public void addIndividualsToPopulation(LinkedList<Individual> children){
         individuals.addAll(children);
     }
 
@@ -37,7 +38,7 @@ public class Population {
         elites.addAll(individuals);
         elites = selection.bestSelection(mode, elites);
         individuals.removeAll(elites);
-        System.out.println("ELITE SIZE = " + elites.size());
+        //System.out.println("ELITE SIZE = " + elites.size());
     }
 
     public void getOneElite(){
@@ -53,7 +54,7 @@ public class Population {
         return (Math.pow((1.5- x1 + x1*x2), 2) + Math.pow((2.25 - x1+x1*x2*x2), 2) + Math.pow((2.625 - x1 + x1*Math.pow(x2, 3)), 2));
     }
 
-    public void calculateIndividualsDecimalValue(int rangeA, int rangeB){
+    public void calculateIndividualsDecimalValue(double rangeA, double rangeB){
         for(Individual i: individuals)
             i.calculateDecimalValue(rangeA, rangeB);
     }

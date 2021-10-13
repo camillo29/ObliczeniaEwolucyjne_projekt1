@@ -37,7 +37,7 @@ public class Individual {
         y=0;
     }
 
-    public void calculateDecimalValue(int rangeA, int rangeB){
+    public void calculateDecimalValue(double rangeA, double rangeB){
         String binaryValue_x1 = new String();
         String binaryValue_x2 = new String();
         //System.out.println(Integer.parseInt("1010", 2));
@@ -53,6 +53,13 @@ public class Individual {
         //System.out.println(x1.byteValue());
         decimalValue_x1 = rangeA + x1 * (rangeB-rangeA) / (Math.pow(2, genes_x1.length) - 1);
         decimalValue_x2 = rangeA + x2 * (rangeB-rangeA) / (Math.pow(2, genes_x2.length) - 1);
+    }
+
+    public void setByteX1(int byteValue, int index){
+        genes_x1[index] = byteValue;
+    }
+    public void setByteX2(int byteValue, int index){
+        genes_x2[index] = byteValue;
     }
 
     public void setY(double value){

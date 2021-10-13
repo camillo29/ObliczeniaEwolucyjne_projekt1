@@ -24,7 +24,7 @@ public class Main extends Application {
     }
 
     public void setUpAlgorithm(){
-        GeneticAlgorithm ga = new GeneticAlgorithm(1, 10, 1000, 100, 40, 20, 0.4, 0.1, 0.6, 5); //!!! AFTER SETTING NOT DIVISIBLE AMOUNT FOR SELECTION INFINITE LOOP OCCURS IN TOURNAMENT
+        GeneticAlgorithm ga = new GeneticAlgorithm(-4.5, 4.5, 1000, 100, 40, 20, 0.4, 0.1, 0.6, 2); //!!! AFTER SETTING NOT DIVISIBLE AMOUNT FOR SELECTION INFINITE LOOP OCCURS IN TOURNAMENT
         ga.mainLoop();
         //System.out.println("AAA");
 
