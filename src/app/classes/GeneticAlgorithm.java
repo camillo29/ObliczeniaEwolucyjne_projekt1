@@ -1,6 +1,12 @@
 package app.classes;
 
 
+import app.classes.GUI.GUIManager;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.security.spec.RSAOtherPrimeInfo;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -8,6 +14,7 @@ import java.util.Random;
 
 public class GeneticAlgorithm {
     private Random rn = new Random();
+    private GUIManager gui;
     private int generation = 0;
     private int maxGenerations = 0;
     private double rangeA, rangeB = 0;
@@ -23,7 +30,18 @@ public class GeneticAlgorithm {
     private MutationManager mutationManager;
     private InversionManager inversionManager;
 
-    public GeneticAlgorithm(double rangeA, double rangeB, int maxGenerations, int initialPopulationSize, int geneLength, int bestAndTourneyIndividualsAmount, double mutationProbability, double inversionProbability, double crossProbability, int eliteAmount ){
+    private String selectionMethod;
+    private String crossOverMethod;
+    private String mutationMethod;
+
+    private String mode = "min";
+
+    private FileWriter fw;
+    private BufferedWriter bw;
+    private PrintWriter pw;
+
+    public GeneticAlgorithm(GUIManager gui, double rangeA, double rangeB, int maxGenerations, int initialPopulationSize, int geneLength, int bestAndTourneyIndividualsAmount, double mutationProbability, double inversionProbability, double crossProbability, int eliteAmount){
+        this.gui = gui;
         this.rangeA = rangeA;
         this.rangeB = rangeB;
         this.maxGenerations = maxGenerations;
@@ -41,50 +59,74 @@ public class GeneticAlgorithm {
         inversionManager = new InversionManager(inversionProbability);
     }
 
+    public void setMethods(String selectionMethod, String crossOverMethod, String mutationMethod){
+        this.selectionMethod = selectionMethod;
+        this.crossOverMethod = crossOverMethod;
+        this.mutationMethod = mutationMethod;
+    }
+
+    public void setMode(String mode){
+        this.mode = mode;
+    }
+
     public void mainLoop(){
         //population.calculateIndividualsDecimalValue(rangeA, rangeB);
         //population.calculateIndividualsY();
         //population.debug();
         LinkedList<Individual> children = new LinkedList<>();
         double start = System.currentTimeMillis();
+        try{
+            File file = new File("algorithmOutput.txt");
+            //File testFile = new File("test.txt");
+            //testFile.delete();
+            file.delete();
+            fw = new FileWriter("algorithmOutput.txt", true);
+            bw = new BufferedWriter(fw);
+            pw = new PrintWriter(bw);
+            pw.print("");
+        } catch(Exception e){
+            e.printStackTrace();
+        }
         for(int i = 0; i<maxGenerations; i++){
-            System.out.println("Generation = "+ i + "( Population: " + population.individuals.size() + ")" );
-            //DEBUG
-            //population.calculateIndividualsDecimalValue(rangeA, rangeB);
-            //population.calculateIndividualsY();
-            //Individual solution = population.getBestIndividual();
-
-            //System.out.println("BEST CANDIDATE");
-            //System.out.println("F(" + solution.getDecimalValue_x1() + ", " + solution.getDecimalValue_x2() + ") = " + solution.getY());
-            //END OF DEBUG
+            //System.out.println("Generation = "+ i + "( Population: " + population.individuals.size() + ")" );
             children.clear();
             //EVALUATION
             population.calculateIndividualsDecimalValue(rangeA, rangeB);
             population.calculateIndividualsY();
+            //pw.println("Generation: "+i);
+            //pw.flush();
+            //for(Individual t: population.individuals){
+            //    pw.println("F("+t.getDecimalValue_x1()+", "+t.getDecimalValue_x2()+") = "+t.getY());
+            //}
+            //PRESENTATION
             Individual solution = population.getBestIndividual();
+            gui.addDataToBestSeries(i, solution.getY());
             System.out.println(i+": " + solution.getY());
+            pw.println(i+": " + solution.getY());
+            pw.flush();
 
             //ELITE STRATEGY
-            population.getElites(eliteAmount, "min");
-            //population.getOneElite();
-            //System.out.println("ELITE Y = " + population.elite.getY());
-            //System.out.println(i+": " + population.elite.getY());
+            population.getElites(eliteAmount, mode);
 
             //SELECTION
-            population.setIndividuals(selectionManager.bestSelection("min", population.individuals));
+            population.setIndividuals(selectionManager.decideMethod(mode, population.individuals, selectionMethod));
             //CROSSOVER
             Individual newIndividual1, newIndividual2;
             while(children.size() != initialPopulationSize - eliteAmount){
                 //System.out.println("CROSSOVER, children size = " + children.size());
+                Individual individual1 = population.individuals.get(rn.nextInt(population.individuals.size()));
+                Individual individual2 = population.individuals.get(rn.nextInt(population.individuals.size()));
+
                 if(0+(1-0) * rn.nextDouble()<=crossProbability) {
-                    Individual individual1 = population.individuals.get(rn.nextInt(population.individuals.size()));
-                    Individual individual2 = population.individuals.get(rn.nextInt(population.individuals.size()));
-                    newIndividual1 = new Individual(crossOverManager.crossOver_twoPoints(individual1.genes_x1, individual2.genes_x1, true)
-                            , crossOverManager.crossOver_twoPoints(individual1.genes_x2, individual2.genes_x2, true));
+                    newIndividual1 = new Individual(crossOverManager.decideMethod(individual1.genes_x1, individual2.genes_x1, true, crossOverMethod)
+                            , crossOverManager.decideMethod(individual1.genes_x2, individual2.genes_x2, true, crossOverMethod));
                     children.add(newIndividual1);
-                    newIndividual2 = new Individual(crossOverManager.crossOver_twoPoints(individual2.genes_x1, individual1.genes_x1, false)
-                            , crossOverManager.crossOver_twoPoints(individual2.genes_x2, individual1.genes_x2, false));
-                    children.add(newIndividual2);
+
+                    if(children.size()+eliteAmount != initialPopulationSize) {
+                        newIndividual2 = new Individual(crossOverManager.decideMethod(individual2.genes_x1, individual1.genes_x1, false, crossOverMethod)
+                                , crossOverManager.decideMethod(individual2.genes_x2, individual1.genes_x2, false, crossOverMethod));
+                        children.add(newIndividual2);
+                    }
                 }
             }
             //MUTATION
@@ -98,94 +140,30 @@ public class GeneticAlgorithm {
 
             population.setIndividuals(children);
 
-            population.addIndividualsToPopulation(population.elites); //ENABLE AFTER ELITES IMPLEMENTED
-            //System.out.println("Generation = "+ i + "( Population: " + population.individuals.size() + ")" );
-            //population.addIndividualsToPopulation(children); //DEPRECATED
-            //population.addChildrenToPopulation(population.elites);
-            //population.addIndividualToPopulation(population.elite);
+            population.addIndividualsToPopulation(population.elites);
+
 
         }
 
         population.calculateIndividualsDecimalValue(rangeA, rangeB);
         population.calculateIndividualsY();
         Individual solution = population.getBestIndividual();
+        pw.println(maxGenerations-1 +": " + solution.getY());
+        pw.flush();
+        try {
+            pw.close();
+            bw.close();
+            fw.close();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
         double stop = System.currentTimeMillis();
         System.out.println("BEST SOLUTION");
         System.out.println("F(" + solution.getDecimalValue_x1() + ", " + solution.getDecimalValue_x2() + ") = " + solution.getY());
         System.out.println("Time to calculate = "+(stop-start)/1000 + "s");
-
-
-        //----------------------------------------DEBUG--------------------------------------------------//
-        //population.debug();
-        //population.setIndividuals(selectionManager.bestSelection("min", population.individuals));
-        //population.setIndividuals(selectionManager.tournamentSelection("min", population.individuals));
-        //population.setIndividuals(selectionManager.rouletteSelection("min", population.individuals));
-
-        //DEBUG
-        /*System.out.println("AFTER SELECTION");
-        for(Individual i: population.individuals){
-            System.out.println();
-            System.out.println("x1 = " + i.getDecimalValue_x1() + "|" + "x2 = " + i.getDecimalValue_x2());
-            System.out.println("y = " + i.getY());
-        }*/
-
-        //int[] test1 = {1,1,0,1,0,1,1,0,0,0};
-        //int[] test2 = {1,0,1,1,1,0,0,1,1,0};
-        //Individual newIndividual = new Individual(crossOverManager.crossOver_onePoint(test1, test2), crossOverManager.crossOver_onePoint(test2, test1));
-        //Individual newIndividual = new Individual(crossOverManager.crossOver_twoPoints(test1, test2), crossOverManager.crossOver_twoPoints(test2, test1));
-        //Individual newIndividual = new Individual(crossOverManager.crossOver_threePoints(population.individuals.get(0).genes_x1, population.individuals.get(0).genes_x2),
-        //        crossOverManager.crossOver_threePoints(population.individuals.get(0).genes_x2, population.individuals.get(0).genes_x1));
-        //Individual newIndividual = new Individual(crossOverManager.crossOver_uniform(population.individuals.get(0).genes_x1, population.individuals.get(0).genes_x2),
-        //        crossOverManager.crossOver_uniform(population.individuals.get(0).genes_x2, population.individuals.get(0).genes_x1));
-        /*String c1="",c2="", p1="", p2 = "" ;
-        for(int i = 0; i< newIndividual.genes_x1.length; i++){
-            p1+=population.individuals.get(0).genes_x1[i];
-            p2+=population.individuals.get(0).genes_x2[i];
-            c1+=newIndividual.genes_x1[i];
-            c2+=newIndividual.genes_x2[i];
-        }*/
-        /*System.out.println("Parent x1 = " + p1);
-        System.out.println("Parent x2 = " + p2);
-        System.out.println("Child x1 = " + c1);
-        System.out.println("Child x2 = " + c2);*/
-        //crossOverManager.crossOver_onePoint(test1, test2);
-
-        //crossOverManager.crossOver_twoPoints(test1, test2);
-        //crossOverManager.crossOver_threePoints(population.individuals.get(0).genes_x1, population.individuals.get(1).genes_x1);
-        //Individual individual = crossOverManager.crossOver_uniform(test1, test2);
-
-        /*//Debug
-        String s1 = "", s2 = "";
-        for(int i = 0;i<individual.getGenes_x1().length; i++){
-            s1+=individual.getGenes_x1()[i];
-            s2+=individual.getGenes_x2()[i];
-        }
-        System.out.println("x1 = "+s1 + " | x2 = " + s2);
-
-        population.addIndividualToPopulation(individual);*/
-        /*String s1 = "";
-        for(int i = 0;i<population.individuals.get(0).getGenes_x1().length; i++) {
-            s1 += population.individuals.get(0).getGenes_x1()[i];
-        }
-        //mutationManager.mutate_twoPoints(population.individuals.get(0));
-        inversionManager.inverse(population.individuals.get(0));
-        //DEBUG
-        String s2 = "";
-        for(int i = 0;i<population.individuals.get(0).getGenes_x1().length; i++){
-            s2+=population.individuals.get(0).getGenes_x1()[i];
-        }
-        System.out.println("x1 before = "+s1 + " | x1 after = " + s2);*/
-
+        gui.addDataToBestSeries(maxGenerations-1, solution.getY());
+        gui.exportBestChart();
+        gui.displaySolution(solution, (stop-start)/1000);
 
     }
 }
-
-/*for(int j = 0;j<population.individuals.size()-1; j+=2){
-                if(0+(1-0) * rn.nextDouble()<=crossProbability) {
-                    newIndividual = new Individual(crossOverManager.crossOver_twoPoints(population.individuals.get(j).genes_x1, population.individuals.get(j + 1).genes_x1)
-                            , crossOverManager.crossOver_onePoint(population.individuals.get(j).genes_x2, population.individuals.get(j + 1).genes_x2));
-                    children.add(newIndividual);
-                }
-            }
-
- */

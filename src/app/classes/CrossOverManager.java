@@ -9,6 +9,16 @@ public class CrossOverManager {
     private int thirdCrossOverPoint = 0;
     public CrossOverManager(){}
 
+    public int[] decideMethod(int[] firstIndividualX, int[] secondIndividualX, boolean generatePoint, String method){
+        if(method.equals("ONE_POINT"))
+            return crossOver_onePoint(firstIndividualX, secondIndividualX, generatePoint);
+        else if(method.equals("TWO_POINTS"))
+            return crossOver_twoPoints(firstIndividualX, secondIndividualX, generatePoint);
+        else if(method.equals("THREE_POINTS"))
+            return crossOver_threePoints(firstIndividualX, secondIndividualX, generatePoint);
+        else return crossOver_uniform(firstIndividualX, secondIndividualX);
+    }
+
     public int[] crossOver_onePoint(int[] firstIndividualX, int[] secondIndividualX, boolean generatePoint){
         int[] newGenesX = new int[firstIndividualX.length];
         int crossOverPoint = firstCrossOverPoint;

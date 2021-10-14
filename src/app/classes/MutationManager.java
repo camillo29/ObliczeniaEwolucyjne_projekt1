@@ -10,6 +10,12 @@ public class MutationManager {
         this.probability = probability;
     }
 
+    public void decideMethod(Individual individual, String method){
+        if(method.equals("EDGE")) mutate_edge(individual);
+        else if(method.equals("ONE_POINT")) mutate_onePoint(individual);
+        else mutate_twoPoints(individual);
+    }
+
     public void mutate_edge(Individual individual){
         if(0+(1-0) * rn.nextDouble()<=probability) {
             if (individual.genes_x1[individual.genes_x1.length - 1] == 0)

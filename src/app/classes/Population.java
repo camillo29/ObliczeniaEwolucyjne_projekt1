@@ -51,7 +51,9 @@ public class Population {
     }
 
     public double fitnessFunction(double x1, double x2){
-        return (Math.pow((1.5- x1 + x1*x2), 2) + Math.pow((2.25 - x1+x1*x2*x2), 2) + Math.pow((2.625 - x1 + x1*Math.pow(x2, 3)), 2));
+        //return (Math.pow((x1+2*x2-7),2) + Math.pow((2*x1+x2-5),2)); Buchin
+       // return (Math.pow((1.5- x1 + x1*x2), 2) + Math.pow((2.25 - x1+x1*x2*x2), 2) + Math.pow((2.625 - x1 + x1*Math.pow(x2, 3)), 2)); Beale
+        return (-1 * (1+Math.cos(Math.toRadians(12*Math.sqrt(x1*x1+x2*x2))))/(0.5*(x1*x1+x2*x2)+2));
     }
 
     public void calculateIndividualsDecimalValue(double rangeA, double rangeB){

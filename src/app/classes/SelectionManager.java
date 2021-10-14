@@ -12,6 +12,12 @@ public class SelectionManager {
         this.bestAndTourneyIndividualsAmount = bestAndBestAndTourneyIndividualsAmount;
     }
 
+    public LinkedList<Individual> decideMethod(String mode, LinkedList<Individual> individuals, String method){
+        if(method.equals("BEST")) return bestSelection(mode, individuals);
+        else if(method.equals("TOURNAMENT")) return tournamentSelection(mode, individuals);
+        else return rouletteSelection(mode, individuals);
+    }
+
     //SELECTION USING "BEST" STRATEGY
     public LinkedList<Individual> bestSelection(String mode, LinkedList<Individual> individuals) {
         //int individualsToSelect = (int) (individuals.size() * 0.3);
