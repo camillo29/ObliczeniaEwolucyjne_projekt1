@@ -26,7 +26,7 @@ public class Main extends Application {
         gui.getSubmit().setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                gui.setCharts();
+                //gui.setCharts();
                 setUpAlgorithm(gui,
                         Double.parseDouble(gui.getRangeA().getText()),
                         Double.parseDouble(gui.getRangeB().getText()),

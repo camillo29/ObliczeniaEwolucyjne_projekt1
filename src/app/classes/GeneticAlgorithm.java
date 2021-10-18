@@ -1,6 +1,7 @@
 package app.classes;
 
 
+import app.classes.GUI.ChartManager;
 import app.classes.GUI.GUIManager;
 
 import java.io.BufferedWriter;
@@ -35,10 +36,6 @@ public class GeneticAlgorithm {
     private String mutationMethod;
 
     private String mode = "min";
-
-    private FileWriter fw;
-    private BufferedWriter bw;
-    private PrintWriter pw;
 
     public GeneticAlgorithm(GUIManager gui, double rangeA, double rangeB, int maxGenerations, int initialPopulationSize, int geneLength, int bestAndTourneyIndividualsAmount, double mutationProbability, double inversionProbability, double crossProbability, int eliteAmount){
         this.gui = gui;
@@ -75,35 +72,43 @@ public class GeneticAlgorithm {
         //population.debug();
         LinkedList<Individual> children = new LinkedList<>();
         double start = System.currentTimeMillis();
-        try{
-            File file = new File("algorithmOutput.txt");
-            //File testFile = new File("test.txt");
-            //testFile.delete();
-            file.delete();
-            fw = new FileWriter("algorithmOutput.txt", true);
-            bw = new BufferedWriter(fw);
-            pw = new PrintWriter(bw);
-            pw.print("");
-        } catch(Exception e){
-            e.printStackTrace();
-        }
+        //FILEMANAGERS
+        FileManager bestFile = new FileManager(selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_BEST");
+        FileManager meanFile = new FileManager(selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_MEAN");
+        FileManager deviationFile = new FileManager(selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_DEVIATION");
+        //CHARTMANAGERS
+        ChartManager bestChart = new ChartManager("Best value each generation");
+        ChartManager meanChart = new ChartManager("Mean value each generation");
+        ChartManager deviationChart = new ChartManager("Deviation value each generation");
+
+        double mean = 0.0f;
+        double deviation = 0.0f;
         for(int i = 0; i<maxGenerations; i++){
             //System.out.println("Generation = "+ i + "( Population: " + population.individuals.size() + ")" );
             children.clear();
             //EVALUATION
             population.calculateIndividualsDecimalValue(rangeA, rangeB);
             population.calculateIndividualsY();
-            //pw.println("Generation: "+i);
-            //pw.flush();
-            //for(Individual t: population.individuals){
-            //    pw.println("F("+t.getDecimalValue_x1()+", "+t.getDecimalValue_x2()+") = "+t.getY());
-            //}
             //PRESENTATION
+            for(Individual individual: population.individuals){
+                mean+=individual.getY();
+            }
+            mean /= population.individuals.size();
+            for(Individual individual: population.individuals){
+                deviation += Math.pow(individual.getY() - mean, 2);
+            }
+            deviation /= population.individuals.size();
+            deviation = Math.sqrt(deviation);
             Individual solution = population.getBestIndividual();
-            gui.addDataToBestSeries(i, solution.getY());
+            bestChart.addDataToSeries(i, solution.getY());
+            meanChart.addDataToSeries(i, mean);
+            deviationChart.addDataToSeries(i, deviation);
+
+            bestFile.writeToFile(i + ": " + solution.getY());
+            meanFile.writeToFile(i + ": " + mean);
+            deviationFile.writeToFile(i + ": " + deviation);
+
             System.out.println(i+": " + solution.getY());
-            pw.println(i+": " + solution.getY());
-            pw.flush();
 
             //ELITE STRATEGY
             population.getElites(eliteAmount, mode);
@@ -148,21 +153,18 @@ public class GeneticAlgorithm {
         population.calculateIndividualsDecimalValue(rangeA, rangeB);
         population.calculateIndividualsY();
         Individual solution = population.getBestIndividual();
-        pw.println(maxGenerations-1 +": " + solution.getY());
-        pw.flush();
-        try {
-            pw.close();
-            bw.close();
-            fw.close();
-        } catch(Exception e){
-            e.printStackTrace();
-        }
+        bestFile.writeToFile(maxGenerations-1 + ": " + solution.getY());
+        bestFile.closeFile();
+        meanFile.closeFile();
+        deviationFile.closeFile();
         double stop = System.currentTimeMillis();
         System.out.println("BEST SOLUTION");
         System.out.println("F(" + solution.getDecimalValue_x1() + ", " + solution.getDecimalValue_x2() + ") = " + solution.getY());
         System.out.println("Time to calculate = "+(stop-start)/1000 + "s");
-        gui.addDataToBestSeries(maxGenerations-1, solution.getY());
-        gui.exportBestChart();
+        bestChart.addDataToSeries(maxGenerations-1, solution.getY());
+        bestChart.exportChart("Generation", "Value", "Best value each generation", selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_BESTCHART");
+        meanChart.exportChart("Generation", "Value", "Mean value each generation", selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_MEANCHART");
+        deviationChart.exportChart("Generation", "Value", "Deviation value each generation", selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_DEVIATIONCHART");
         gui.displaySolution(solution, (stop-start)/1000);
 
     }

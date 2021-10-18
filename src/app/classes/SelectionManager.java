@@ -53,12 +53,15 @@ public class SelectionManager {
     //SELECTION USING "TOURNAMENT" STRATEGY
     public LinkedList<Individual> tournamentSelection(String mode, LinkedList<Individual> individuals) {
         int amountOfTournaments = (int)individuals.size()/bestAndTourneyIndividualsAmount;
+
         LinkedList<Tournament> tournaments = new LinkedList<Tournament>();
 
         //Creating tournaments
         for(int i = 0; i<amountOfTournaments; i++){
-            tournaments.add(new Tournament());
+            tournaments.add(new Tournament(bestAndTourneyIndividualsAmount));
         }
+        if(amountOfTournaments*bestAndTourneyIndividualsAmount != individuals.size())
+            tournaments.add(new Tournament(individuals.size() - amountOfTournaments*bestAndTourneyIndividualsAmount));
 
         //Individuals assignment to tournaments
         boolean assigned = false;
@@ -67,15 +70,12 @@ public class SelectionManager {
             assigned = false;
             while(!assigned){
                 index = rn.nextInt(tournaments.size());
-                if(tournaments.get(index).getPopulationSize() < bestAndTourneyIndividualsAmount){
+                if(tournaments.get(index).getPopulationSize() < tournaments.get(index).getMaxPop()){
                     tournaments.get(index).addIndividual(i);
                     assigned=true;
                 }
             }
         }
-        //for(Tournament t: tournaments){
-        //    System.out.println("pop size in tournament: " + t.getPopulationSize());
-        //}
         //Determining winners
         LinkedList<Individual> winners = new LinkedList<Individual>();
         for(Tournament t: tournaments){

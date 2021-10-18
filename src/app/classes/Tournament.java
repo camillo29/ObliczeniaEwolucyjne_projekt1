@@ -5,8 +5,11 @@ import java.util.LinkedList;
 public class Tournament {
     LinkedList<Individual> populationForSelection = new LinkedList<>();
     Individual winner;
+    private int maxPop;
 
-    public Tournament(){}
+    public Tournament(int maxPop){
+        this.maxPop = maxPop;
+    }
 
     public void determineWinner(String mode){
         Individual best = populationForSelection.getFirst();
@@ -33,5 +36,9 @@ public class Tournament {
     }
     public void addIndividual(Individual individual){
         populationForSelection.add(individual);
+    }
+
+    public int getMaxPop() {
+        return maxPop;
     }
 }

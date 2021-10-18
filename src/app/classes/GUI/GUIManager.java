@@ -54,9 +54,6 @@ public class GUIManager {
     //Radio button
     private RadioButton maximization;
 
-    //Charts
-    private LineChart<Number, Number> bestChart;
-    private XYChart.Series bestSeries;
 
     //Stage
     Stage primaryStage;
@@ -108,41 +105,6 @@ public class GUIManager {
 
         primaryStage.setScene(new Scene(pane, width, height));
 
-    }
-
-    public void setCharts(){
-        bestSeries = new XYChart.Series();
-        bestSeries.setName("Data");
-    }
-
-    public void addDataToBestSeries(int generation, double best){
-        bestSeries.getData().add(new XYChart.Data(generation, best));
-    }
-
-    public void exportBestChart(){
-        final NumberAxis xAxis = new NumberAxis();
-        final NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Generation");
-        yAxis.setLabel("Best");
-        this.bestChart = new LineChart<Number, Number>(xAxis, yAxis);
-        this.bestChart.setTitle("Best value each generation");
-        this.bestChart.setCreateSymbols(false);
-
-        Scene scene = new Scene(bestChart, 1200, 400);
-        bestChart.setAnimated(false);
-
-        bestChart.getData().add(bestSeries);
-        saveAsPng(scene, "C:\\Projekty\\ObliczeniaEwolucyjne\\chart.png");
-    }
-
-    public void saveAsPng(Scene scene, String path){
-        WritableImage image = scene.snapshot(null);
-        File file = new File(path);
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void displaySolution(Individual solution, double time){
