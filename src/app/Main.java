@@ -5,15 +5,6 @@ import app.classes.GeneticAlgorithm;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -21,12 +12,10 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         GUIManager gui = new GUIManager(600, 900, primaryStage);
-        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         gui.setUpGUI();
         gui.getSubmit().setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                //gui.setCharts();
                 setUpAlgorithm(gui,
                         Double.parseDouble(gui.getRangeA().getText()),
                         Double.parseDouble(gui.getRangeB().getText()),
@@ -45,7 +34,6 @@ public class Main extends Application {
             }
         });
         gui.getPrimaryStage().show();
-        //setUpAlgorithm();
     }
 
 

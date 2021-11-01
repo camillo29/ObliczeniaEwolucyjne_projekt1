@@ -3,13 +3,8 @@ package app.classes;
 
 import app.classes.GUI.ChartManager;
 import app.classes.GUI.GUIManager;
+import app.classes.Managers.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.security.spec.RSAOtherPrimeInfo;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -67,16 +62,13 @@ public class GeneticAlgorithm {
     }
 
     public void mainLoop(){
-        //population.calculateIndividualsDecimalValue(rangeA, rangeB);
-        //population.calculateIndividualsY();
-        //population.debug();
         LinkedList<Individual> children = new LinkedList<>();
         double start = System.currentTimeMillis();
-        //FILEMANAGERS
-        FileManager bestFile = new FileManager(selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_BEST");
-        FileManager meanFile = new FileManager(selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_MEAN");
-        FileManager deviationFile = new FileManager(selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_DEVIATION");
-        //CHARTMANAGERS
+        //FILE MANAGERS
+        FileManager bestFile = new FileManager(selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_BEST.txt");
+        FileManager meanFile = new FileManager(selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_MEAN.txt");
+        FileManager deviationFile = new FileManager(selectionMethod + "_"+crossOverMethod + "_" + mutationMethod + "_" + mode + "_DEVIATION.txt");
+        //CHART MANAGERS
         ChartManager bestChart = new ChartManager("Best value each generation");
         ChartManager meanChart = new ChartManager("Mean value each generation");
         ChartManager deviationChart = new ChartManager("Deviation value each generation");
@@ -84,7 +76,6 @@ public class GeneticAlgorithm {
         double mean = 0.0f;
         double deviation = 0.0f;
         for(int i = 0; i<maxGenerations; i++){
-            //System.out.println("Generation = "+ i + "( Population: " + population.individuals.size() + ")" );
             children.clear();
             //EVALUATION
             population.calculateIndividualsDecimalValue(rangeA, rangeB);
@@ -118,25 +109,24 @@ public class GeneticAlgorithm {
             //CROSSOVER
             Individual newIndividual1, newIndividual2;
             while(children.size() != initialPopulationSize - eliteAmount){
-                //System.out.println("CROSSOVER, children size = " + children.size());
                 Individual individual1 = population.individuals.get(rn.nextInt(population.individuals.size()));
                 Individual individual2 = population.individuals.get(rn.nextInt(population.individuals.size()));
 
                 if(0+(1-0) * rn.nextDouble()<=crossProbability) {
-                    newIndividual1 = new Individual(crossOverManager.decideMethod(individual1.genes_x1, individual2.genes_x1, true, crossOverMethod)
-                            , crossOverManager.decideMethod(individual1.genes_x2, individual2.genes_x2, true, crossOverMethod));
+                    newIndividual1 = new Individual(crossOverManager.decideMethod(individual1.getGenes_x1(), individual2.getGenes_x1(), true, crossOverMethod)
+                            , crossOverManager.decideMethod(individual1.getGenes_x2(), individual2.getGenes_x2(), true, crossOverMethod));
                     children.add(newIndividual1);
 
                     if(children.size()+eliteAmount != initialPopulationSize) {
-                        newIndividual2 = new Individual(crossOverManager.decideMethod(individual2.genes_x1, individual1.genes_x1, false, crossOverMethod)
-                                , crossOverManager.decideMethod(individual2.genes_x2, individual1.genes_x2, false, crossOverMethod));
+                        newIndividual2 = new Individual(crossOverManager.decideMethod(individual2.getGenes_x1(), individual1.getGenes_x1(), false, crossOverMethod)
+                                , crossOverManager.decideMethod(individual2.getGenes_x2(), individual1.getGenes_x2(), false, crossOverMethod));
                         children.add(newIndividual2);
                     }
                 }
             }
             //MUTATION
             for(Individual individual: children){
-                mutationManager.mutate_twoPoints(individual);
+                mutationManager.decideMethod(individual, mutationMethod);
             }
             //INVERSION
             for(Individual individual: children){

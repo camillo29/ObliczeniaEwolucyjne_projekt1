@@ -1,7 +1,7 @@
 package app.classes;
 
-import java.util.Collections;
-import java.util.HashSet;
+import app.classes.Managers.SelectionManager;
+
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -11,7 +11,6 @@ public class Population {
     LinkedList<Individual> individuals;
     LinkedList<Individual> elites = new LinkedList<>();
     Individual elite;
-    //int fittest = 0;
     int bestAndTourneyIndividualsAmount;
 
     public Population(int size, int geneLength, int bestAndTourneyIndividualsAmount ){
@@ -38,7 +37,6 @@ public class Population {
         elites.addAll(individuals);
         elites = selection.bestSelection(mode, elites);
         individuals.removeAll(elites);
-        //System.out.println("ELITE SIZE = " + elites.size());
     }
 
     public void getOneElite(){
@@ -51,8 +49,6 @@ public class Population {
     }
 
     public double fitnessFunction(double x1, double x2){
-        //return (Math.pow((x1+2*x2-7),2) + Math.pow((2*x1+x2-5),2)); Buchin
-       // return (Math.pow((1.5- x1 + x1*x2), 2) + Math.pow((2.25 - x1+x1*x2*x2), 2) + Math.pow((2.625 - x1 + x1*Math.pow(x2, 3)), 2)); Beale
         return (-1 * (1+Math.cos(Math.toRadians(12*Math.sqrt(x1*x1+x2*x2))))/(0.5*(x1*x1+x2*x2)+2)); // Dropwave
     }
 
@@ -77,15 +73,6 @@ public class Population {
                 best = i;
         }
         return best;
-    }
-    public void debug(){
-        int j = 0;
-        for(Individual i: individuals){
-            System.out.println("i = " + j);
-            System.out.println("x1 = " + i.getDecimalValue_x1() + "|" + "x2 = " + i.getDecimalValue_x2());
-            System.out.println("y = " + i.getY());
-            j++;
-        }
     }
 
 }

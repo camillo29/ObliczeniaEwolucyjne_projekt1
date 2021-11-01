@@ -1,4 +1,7 @@
-package app.classes;
+package app.classes.Managers;
+
+import app.classes.Individual;
+import app.classes.Tournament;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,9 +23,7 @@ public class SelectionManager {
 
     //SELECTION USING "BEST" STRATEGY
     public LinkedList<Individual> bestSelection(String mode, LinkedList<Individual> individuals) {
-        //int individualsToSelect = (int) (individuals.size() * 0.3);
         int individualsToSelect = bestAndTourneyIndividualsAmount;
-        //System.out.println(individualsToSelect);
         LinkedList<Individual> listOfBest = new LinkedList<Individual>();
         Individual bestIndividual = individuals.getFirst();
 
@@ -109,17 +110,13 @@ public class SelectionManager {
             }
             i.setDistributor(distributor + i.getProbability());
             distributor = i.getDistributor();
-            //System.out.println("y = " + i.getY() + " distributor = " + i.getDistributor());
         }
         double random = 0.0f;
-        mainFor: for(int i = 0; i<bestAndTourneyIndividualsAmount; i++){     //<- i<bestAndTourneyIndividualsAmount TO CHANGE
+        mainFor: for(int i = 0; i<bestAndTourneyIndividualsAmount; i++){
             random = 0+(1-0) * rn.nextDouble();
             for(int j = 0; j<individuals.size(); j++){
                 if(random < individuals.get(j).getDistributor()){
                     selected.add(individuals.get(j));
-                    //System.out.println("random = " + random + " distributor = " + individuals.get(j).getDistributor());
-                    //System.out.println("x1 = " + individuals.get(j).getDecimalValue_x1() + "x2 = " + individuals.get(j).getDecimalValue_x2());
-                    //System.out.println("y = " + individuals.get(j).getY());
                     continue mainFor;
                 }
             }

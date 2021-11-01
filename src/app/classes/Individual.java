@@ -1,11 +1,10 @@
 package app.classes;
-import java.math.BigInteger;
 import java.util.Random;
 
 public class Individual {
     Random rn = new Random();
-    int[] genes_x1; //binary length
-    int[] genes_x2; //binary length
+    private int[] genes_x1;
+    private int[] genes_x2;
     double decimalValue_x1 = 0;
     double decimalValue_x2 = 0;
 
@@ -40,7 +39,6 @@ public class Individual {
     public void calculateDecimalValue(double rangeA, double rangeB){
         String binaryValue_x1 = new String();
         String binaryValue_x2 = new String();
-        //System.out.println(Integer.parseInt("1010", 2));
 
         for(int i=genes_x1.length-1;i>=0; i--){
             binaryValue_x1+=genes_x1[i];
@@ -49,8 +47,6 @@ public class Individual {
         long x1 = Long.parseLong(binaryValue_x1, 2);
         long x2 = Long.parseLong(binaryValue_x2, 2);
 
-        //System.out.println(x1.intValue());
-        //System.out.println(x1.byteValue());
         decimalValue_x1 = rangeA + x1 * (rangeB-rangeA) / (Math.pow(2, genes_x1.length) - 1);
         decimalValue_x2 = rangeA + x2 * (rangeB-rangeA) / (Math.pow(2, genes_x2.length) - 1);
     }

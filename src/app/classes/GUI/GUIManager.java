@@ -1,35 +1,19 @@
 package app.classes.GUI;
 
 import app.classes.Individual;
-import com.sun.javafx.fxml.builder.JavaFXImageBuilder;
-import com.sun.javafx.scene.control.InputField;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.embed.swing.SwingFXUtils;
-
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 
 public class GUIManager {
     private int width = 0;
@@ -67,7 +51,7 @@ public class GUIManager {
     public void setUpGUI(){
         primaryStage.setTitle("Obliczenia ewolucyjne - projekt 1");
         Pane pane = new Pane();
-        Text text = createText("Genetic algorithm for optimizing min/max in Beale function", 50 ,50);
+        Text text = createText("Genetic algorithm for optimizing min/max in Drop-wave function", 30 ,50);
 
         submit = createButton("Calculate", width/2-50, height-50, 100, 30);
         //TextFields init
