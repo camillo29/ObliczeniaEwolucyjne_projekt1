@@ -42,7 +42,7 @@ public class Main extends Application {
     }
 
     public void setUpAlgorithm(GUIManager gui, double rangeA, double rangeB, int maxGenerations, int initialPopulationSize, int geneLength, int bestAndTournamentIndividuals, double mutationProbability, double inversionProbability, double crossProbability, int eliteAmount, String selectionMethod, String crossOverMethod, String mutationMethod, boolean mode){
-        GeneticAlgorithm ga = new GeneticAlgorithm(gui, rangeA, rangeB, maxGenerations, initialPopulationSize, geneLength, bestAndTournamentIndividuals, mutationProbability, inversionProbability, crossProbability, eliteAmount); //!!! AFTER SETTING NOT DIVISIBLE AMOUNT FOR SELECTION INFINITE LOOP OCCURS IN TOURNAMENT
+        GeneticAlgorithm ga = new GeneticAlgorithm(gui, rangeA, rangeB, maxGenerations, initialPopulationSize, geneLength, bestAndTournamentIndividuals, mutationProbability, inversionProbability, crossProbability, eliteAmount);
         ga.setMethods(selectionMethod, crossOverMethod, mutationMethod);
         if(mode == true) ga.setMode("max");
         else ga.setMode("min");
