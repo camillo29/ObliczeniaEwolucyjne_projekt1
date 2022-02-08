@@ -1,5 +1,6 @@
 # ObliczeniaEwolucyjne_projekt1
 Projekt z obliczeń ewolucyjnych (klasyczna reprezentacja chromosomu, algorytm genetyczny)
+
 Aplikacja ma na celu wyznaczenie minimum funkcji Drop-wave (-1.0) dla x1 i x2 o wartościach (0, 0) za pomocą klasycznego algorytmu ewolucyjnego
 
 - Java 11
